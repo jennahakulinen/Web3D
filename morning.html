@@ -23,23 +23,30 @@
 
 		import * as THREE from 'three';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 		const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor('rgb(52, 192, 235, 235)');
 			document.body.appendChild( renderer.domElement );
 
-			const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-			const material = new THREE.MeshPhongMaterial( { 
-				color: 0x00ff00, 
-				wireframe: false
-			} );
-			const cube = new THREE.Mesh( geometry, material );
+			// const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+			// const material = new THREE.MeshPhongMaterial( { 
+			// 	color: 0x00ff00, 
+			// 	wireframe: false
+			// } );
+			// const cube = new THREE.Mesh( geometry, material );
+			// scene.add( cube );
 
-			scene.add( cube );
+			const directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 5 );
+			scene.add(directionalLight);
+
+			const loader = new GLTFLoader().setPath( 'models/' );
+				loader.load( 'bbear.glb', function ( gltf ) {
+				scene.add( gltf.scene );
+			} );
 
 			const axesHelper = new THREE.AxesHelper( 5 );
 			scene.add( axesHelper );
@@ -53,9 +60,6 @@
 			camera.position.y = 2;
 			camera.position.x = 2
 			controls.update();
-
-			const light = new THREE.AmbientLight( 0x404040 ); // soft white light
-			scene.add( light );
 
 			camera.lookAt(axesHelper.position);
 
