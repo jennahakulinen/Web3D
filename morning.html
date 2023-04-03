@@ -24,6 +24,9 @@
 		import * as THREE from 'three';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+		import { VRButton } from 'three/addons/webxr/VRButton.js';
+
 
 		const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -31,6 +34,11 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor('rgb(52, 192, 235, 235)');
 			document.body.appendChild( renderer.domElement );
+			document.body.appendChild( VRButton.createButton( renderer ) );
+			renderer.xr.enabled = true;
+
+			renderer.toneMapping = THREE.LinearToneMapping;
+ 			renderer.outputEncoding = THREE.sRGBEncoding;
 
 			// const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 			// const material = new THREE.MeshPhongMaterial( { 
@@ -44,14 +52,28 @@
 			scene.add(directionalLight);
 
 			const loader = new GLTFLoader().setPath( 'models/' );
-				loader.load( 'bear.glb', function ( gltf ) {
+				loader.load( 'world.glb', function ( gltf ) {
 				scene.add( gltf.scene );
 			} );
 
-			const barrel = new GLTFLoader().setPath( 'models/' );
-				loader.load( 'barrel.gltf', function ( gltf ) {
+			new RGBELoader().setPath('hdr/').load('lauter_waterfall_4k.hdr', function (texture)
+			{
+			texture.mapping = THREE.EquirectangularReflectionMapping;
+			scene.background = texture;
+			scene.environment = texture;
+			// model
+			const loader = new GLTFLoader().setPath( 'models/' );
+				loader.load( 'world.glb', function ( gltf ) {
 				scene.add( gltf.scene );
 			} );
+			});
+
+		
+
+			// const barrel = new GLTFLoader().setPath( 'models/' );
+			// 	loader.load( 'barrel.gltf', function ( gltf ) {
+			// 	scene.add( gltf.scene );
+			// } );
 
 			const axesHelper = new THREE.AxesHelper( 5 );
 			scene.add( axesHelper );
@@ -77,16 +99,10 @@
 				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
-			function animate() {
-				requestAnimationFrame( animate );
-
-				// cube.rotation.x += 0.01;
-				// cube.rotation.y += 0.01;
-
+			renderer.setAnimationLoop( function () {
+				controls.update();
 				renderer.render( scene, camera );
-			}
-
-			animate();
+			} );
 
 		</script>
 	</body>
