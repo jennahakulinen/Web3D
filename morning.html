@@ -48,7 +48,7 @@
 			// const cube = new THREE.Mesh( geometry, material );
 			// scene.add( cube );
 
-			const directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 5 );
+			const directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 2 );
 			scene.add(directionalLight);
 
 			const loader = new GLTFLoader().setPath( 'models/' );
@@ -63,7 +63,7 @@
 			scene.environment = texture;
 			// model
 			const loader = new GLTFLoader().setPath( 'models/' );
-				loader.load( 'world.glb', function ( gltf ) {
+				loader.load( 'forest.glb', function ( gltf ) {
 				scene.add( gltf.scene );
 			} );
 			});
