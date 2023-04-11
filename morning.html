@@ -55,6 +55,9 @@
 		renderer.toneMapping = THREE.LinearToneMapping;
 		renderer.outputEncoding = THREE.sRGBEncoding;
 
+		group = new THREE.Group();
+ 		scene.add(group);
+
 		// const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 		// const material = new THREE.MeshPhongMaterial( { 
 		// 	color: 0x00ff00, 
@@ -82,7 +85,8 @@
 			loader.load( 'forest.glb', function ( gltf ) {
 				gltf.scene.position.y = -2;
 				gltf.scene.position.x = -5;
-			scene.add( gltf.scene );
+			// scene.add( gltf.scene );
+			group.add(gltf.scene);
 		} );
 		});
 
@@ -148,8 +152,91 @@
 			raycaster = new THREE.Raycaster();
 		}
 
-		function onSelectStart(event) {}
-		function onSelectEnd(event) {}
+		function onSelectStart( event ) {
+
+		const controller = event.target;
+
+		const intersections = getIntersections( controller );
+
+		if ( intersections.length > 0 ) {
+
+			const intersection = intersections[ 0 ];
+
+			const object = intersection.object;
+			object.material.emissive.b = 1;
+			controller.attach( object );
+
+			controller.userData.selected = object;
+
+		}
+
+		}
+
+		function onSelectEnd( event ) {
+
+		const controller = event.target;
+
+		if ( controller.userData.selected !== undefined ) {
+
+			const object = controller.userData.selected;
+			object.material.emissive.b = 0;
+			group.attach( object );
+
+			controller.userData.selected = undefined;
+
+		}
+
+
+		}
+
+		function getIntersections( controller ) {
+
+		tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+		raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+		raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+
+		return raycaster.intersectObjects( group.children, true );
+
+		}
+
+		function intersectObjects( controller ) {
+
+		// Do not highlight when already selected
+
+		if ( controller.userData.selected !== undefined ) return;
+
+		const line = controller.getObjectByName( 'line' );
+		const intersections = getIntersections( controller );
+
+		if ( intersections.length > 0 ) {
+
+			const intersection = intersections[ 0 ];
+
+			const object = intersection.object;
+			object.material.emissive.r = 1;
+			intersected.push( object );
+
+			line.scale.z = intersection.distance;
+
+		} else {
+
+			line.scale.z = 5;
+
+		}
+
+		}
+
+		function cleanIntersected() {
+
+		while ( intersected.length ) {
+
+			const object = intersected.pop();
+			object.material.emissive.r = 0;
+
+		}
+
+		}
 
 		const controls = new OrbitControls( camera, renderer.domElement );
 
@@ -173,6 +260,13 @@
 		}
 
 		renderer.setAnimationLoop( function () {
+			renderer.setAnimationLoop(function () {
+			cleanIntersected();
+			intersectObjects(controller1);
+			intersectObjects(controller2);
+			controls.update();
+			renderer.render(scene, camera);
+			});
 			controls.update();
 			renderer.render( scene, camera );
 		} );
