@@ -82,13 +82,20 @@
 		scene.environment = texture;
 		// model
 		const loader = new GLTFLoader().setPath( 'models/' );
-			loader.load( 'forest.glb', function ( gltf ) {
+			loader.load( 'world_landscape.glb', function ( gltf ) {
+				gltf.scene.position.y = -2;
+				gltf.scene.position.x = -5;
+			// scene.add( gltf.scene );
+			scene.add(gltf.scene);
+		} );
+		});
+		const loader2 = new GLTFLoader().setPath( 'models/' );
+			loader2.load( 'world_grab.glb', function ( gltf ) {
 				gltf.scene.position.y = -2;
 				gltf.scene.position.x = -5;
 			// scene.add( gltf.scene );
 			group.add(gltf.scene);
 		} );
-		});
 
 	
 
