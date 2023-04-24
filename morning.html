@@ -44,6 +44,8 @@
       let teleportgroup;
       let marker, baseReferenceSpace;
       let INTERSECTION;
+      let mixer;
+      const clock = new THREE.Clock();
 
       //////////////
       //Set up the scene
@@ -116,6 +118,24 @@
         gltf.scene.position.x = -5;
         // scene.add( gltf.scene );
         group.add(gltf.scene);
+      });
+      const loader3 = new GLTFLoader().setPath("models/");
+      loader3.load("Chest-test.glb", function (gltf) {
+        gltf.scene.position.y = 5;
+        gltf.scene.position.x = 5;
+        // scene.add( gltf.scene );
+        mixer = new THREE.AnimationMixer(gltf.scene);
+        const clips = gltf.animations;
+
+        // console.log(clips);
+
+        // Play a specific animation
+        const clip = THREE.AnimationClip.findByName(clips, "Action");
+        console.log(clip);
+        const action = mixer.clipAction(clip);
+        action.play();
+
+        scene.add(gltf.scene);
       });
 
       // const barrel = new GLTFLoader().setPath( 'models/' );
@@ -306,6 +326,15 @@
         intersectObjects(controller2);
         controls.update();
         moveMarker();
+
+        const delta = clock.getDelta();
+
+        // console.log(delta);
+
+        if (typeof mixer !== "undefined") {
+          mixer.update(delta);
+        }
+
         renderer.render(scene, camera);
       });
 
