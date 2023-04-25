@@ -121,10 +121,15 @@
       });
       const loader3 = new GLTFLoader().setPath("models/");
       loader3.load("Chest-test.glb", function (gltf) {
-        gltf.scene.position.y = 5;
-        gltf.scene.position.x = 5;
+        gltf.scene.position.y = -1;
+        gltf.scene.position.x = -25;
+        gltf.scene.position.z = -12;
         // scene.add( gltf.scene );
+
+        // jos ei starttaa niin tässä vika
+        // gltf.scene.children[0];
         mixer = new THREE.AnimationMixer(gltf.scene);
+
         const clips = gltf.animations;
 
         // console.log(clips);
